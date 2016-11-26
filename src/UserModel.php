@@ -20,9 +20,9 @@
 class UserModel
 {
     /**
-     *  @var string $table      Database table name.
+     *  @var string $table      Default database table name.
      */
-    protected $table = 'users';
+    public $table = 'users';
     /*
      *  @var int    $u_id       User id number, generated upon insertion in db.
      */
@@ -68,7 +68,6 @@ class UserModel
     {
         $this->db = $db;
         $this->field_count = count($this->fields);
-        
     }
 
     /*
@@ -107,7 +106,7 @@ class UserModel
             }
             try {
                 $inserted = $stmt->execute();
-            } catch ( PDOException $e ) {
+            } catch (PDOException $e) {
                 $this->response = "New user creation failed: \n" . $this->printPDOException($e);
                 return false;
             }
@@ -128,7 +127,7 @@ class UserModel
      */    
     public function updateUser($params, $id)
     {
-        if($this->validateParams($params) === true && is_int($id)){
+        if($this->validateParams($params) === true && $this->validateID($id)){
             $param_count = count($params);
             $fields = array_keys($params);
             
@@ -156,25 +155,18 @@ class UserModel
             $this->response = $update_result ? 'user updated' : 'user update failed';
             return $update_result;
         } else {
-            if(empty($this->errors)){ 
-                $this->errors = 'ERROR: id given is not an integer.';
-            }
             $this->response = $this->printErrors();
             return false;
         }
     }
-    
+        
     /*
      *  @param int      $id         Database id of user to delete
      *  @return boolean             true on success, false on failure
      */    
     public function deleteUser($id)
     {
-        if(is_string($id)){
-            //get user by email, just in case
-            $id = $this->getUserByEmail($id);
-        }
-        if(is_int($id)){
+        if($this->validateID($id)){
             $sql = "DELETE FROM `$this->table` WHERE `u_id` = ?;";
             $stmt = $this->db->dbh->prepare($sql);
             $stmt->bindValue(1, $id, PDO::PARAM_INT);
@@ -182,6 +174,7 @@ class UserModel
             $this->response = $deleted ? 'User deleted' : 'User delete failed';
             return $deleted;
         }
+        return false;
     }
 
     /*
@@ -196,12 +189,16 @@ class UserModel
 
             $stmt->bindValue(1, $email, PDO::PARAM_STR);
             $id_result = $stmt->execute();
-            if($id_result){
-                $rs = $stmt->fetch($this->db->fetch_mode);
+            $rs = $stmt->fetch($this->db->fetch_mode);
+            if($rs['u_id']){
                 $this->response = $rs['u_id'];
                 return $rs['u_id'];
+            } else {
+                $this->response = 'User not found!';
+                return false;
             }
-            $this->response = 'User not found!';
+        } else {
+            $this->errors[] = 'Email given is not a valid string.';
             return false;
         }
     }
@@ -260,8 +257,22 @@ class UserModel
                 default: break;
             }//switch
         } //fe
+        return true;        
+    }
+
+    /*
+     *  @param int $id      Database id of user to update
+     *  @return boolean     true on success, false on failure
+     */    
+    public function validateID($id){
+        if(!is_int($id)){
+            $this->errors[] = 'ERROR: id given is not an integer.';
+            return false;
+        } else if(!$id > 0){
+            $this->errors[] = 'ERROR: id must be greater than 0';
+            return false;
+        }
         return true;
-        
     }
     
     /*
@@ -274,13 +285,13 @@ class UserModel
     }
 
     /*
-     *  @return string          Concatenated string of all errors
+     *  @return string          Concatenated string of all errors - should be in View
      */    
     public function printErrors()
     {
         $error_resp = '';
         foreach ($this->errors as $e){
-            $error_resp .= 'ERROR: '. $e .'<br>';
+            $error_resp .= 'ERROR: '. $e ."\n";
         }
         return $error_resp;
     }
@@ -329,5 +340,16 @@ class UserModel
     {
         $users = $this->getAllUsers();
         $this->response = $users ? $users : 'ERROR: Unable to show all users.';
+        return $users;
+    }
+    
+    public function setTable($table){
+        if(is_string($table)){
+            $this->table = $table;
+        }
+    }
+    
+    public function getTable(){
+        return $this->table;
     }
 }

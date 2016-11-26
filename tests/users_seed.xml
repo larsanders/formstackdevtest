@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="my_app">
+	<table_data name="users_test">
+	<row>
+		<field name="u_id">1</field>
+		<field name="email">a@b.io</field>
+		<field name="first_name">test</field>
+		<field name="last_name">user</field>
+		<field name="password">ca6d8d3efe5ad313b5e0c6d4dab7f3cd3a1ad03b1eaf829cc6bd6b91106cf1e5</field>
+	</row>
+	</table_data>
+</database>
+</mysqldump>

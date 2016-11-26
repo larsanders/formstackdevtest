@@ -1,17 +1,12 @@
 <?php
-
+/*
+ *  @todo Add docblocks
+ */
 /************************************\
     BASIC PDO/MYSQL DATABASE PIPE
 \************************************/
 
 class DB {
-    private $config = [ 'db_server' => '',
-                        'db_name' => '',
-                        'db_user' => '',
-                        'db_pass' => '',
-                        'db_port' => 0,
-                        'db_charset' => '',
-                        ];
     private $db_server;
     private $db_name;
     private $db_user;
@@ -19,7 +14,7 @@ class DB {
     private $db_port;
     private $db_charset;
     private $db_dsn;
-    private $db_table;
+    public $db_table = '';
     public $error;
     public $dbh;
     /*
@@ -27,7 +22,6 @@ class DB {
      * @var int
      */
     public $fetch_mode = PDO::FETCH_ASSOC;
-
     
     /*
         Requires array of database connection parameters
@@ -38,8 +32,7 @@ class DB {
         $this->db_user = $config['db_user'] ? $config['db_user'] : '';
         $this->db_pass = $config['db_pass'] ? $config['db_pass'] : '';
         $this->db_port = $config['db_port'] ? $config['db_port'] : 3306;
-        $this->db_charset = isset($config['db_charset']) ? $config['db_charset'] : 'UTF8';
-        
+        $this->db_charset = isset($config['db_charset']) ? $config['db_charset'] : 'UTF8';     
         $this->setDSN();
         $this->connectDBH();
     }
@@ -71,20 +64,4 @@ class DB {
     private function printError($e){
         echo '<h4>PDO EXCEPTION</h4>' . $e->getMessage() . ' in file ' .  $e->getFile() . ':' . $e->getLine() .'<br>';
     }
-    
-    public function setTable($table){
-        if(is_string($table)){
-            $this->table = $table;
-        }
-    }
-
-    public function getOne($query){
-        $res = $this->dbh->prepare($query);
-        
-    }
-    
-    public function getAll(){
-    
-    }
-
 }

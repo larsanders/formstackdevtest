@@ -76,13 +76,12 @@ class UserModel
      *          ['email']       string  Email address must be 6 - 100 characters, and contain @
      *          ['first_name']  string  First name, non-zero length string
      *          ['last_name']   string  First name, non-zero length string
-     *          ['password']    string  Password must contain one letter, one number, and one special character
+     *          ['password']    string  Password require one letter, one number, and one special character
      *  @param array    $params         See array structure above
      *  @return boolean                 true on success, false on failure
      */    
     public function createUser($params)
     {
-
         if(is_array($params) && $this->validateParams($params) === true){
 
             //hash password prior to inserting
@@ -213,6 +212,9 @@ class UserModel
      */    
     protected function validateParams($params)
     {
+        if(empty($params)){
+            return false;
+        }
         foreach($params as $k => $v){
             switch($k){
                 case 'email': 

@@ -1,3 +1,6 @@
 #Vagrante
 .vagrant/
 Vagrantfile
+
+#none of this
+.DS_Store

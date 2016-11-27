@@ -3,34 +3,23 @@
  *  @todo setup autoloading
  *  @todo add namespace
  */
-include '/vagrant/src/UserModel.php';
-include '/vagrant/src/db.php';
-
+include_once '/vagrant/tests/dbTestHelper.php';
+include_once '/vagrant/src/UserModel.php';
 
 class UserModelTest extends PHPUnit_Framework_TestCase
 {
     private $db;
+    private $dbHelper;
     private $um;
     private $table = 'users_test';
-    public $initialDBState;
-    public $seed_data =  ['u_id' => 1,
-                        'email' => 'a@b.io',
-                        'first_name' => 'test', 
-                        'last_name' => 'user',   
-                        'password' => 'ca6d8d3efe5ad313b5e0c6d4dab7f3cd3a1ad03b1eaf829cc6bd6b91106cf1e5'
-                        ];
 
+    /** Setup before each test */        
     public function setUp()
     {
-        $this->db = $this->getDBConnection();
+        $this->dbHelper = new dbTestHelper();        
+        $this->db = $this->dbHelper->db;
         $this->um = new UserModel($this->db);
         $this->um->setTable($this->table);
-        $this->getInitialDBState();
-    }
-    
-    public function tearDown()
-    {
-        $this->db = null;
     }
 
     /**
@@ -58,80 +47,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase
         $prop->setAccessible(true);
         return $prop;
     }
-
-    /**
-     *  Generates a database connection
-     */        
-    public function getDBConnection(){
-        include '/vagrant/config/settings.php';
-        $db = new DB($settings);
-        return $db;    
-    }
-
-    /**
-     *  Retrieves seed data from db
-     */
-    public function getInitialDBState()
-    {
-        $stmt = $this->db->dbh->prepare("SELECT * FROM $this->table;");
-        $stmt->execute();
-        $actual = $stmt->fetch(PDO::FETCH_ASSOC);
-        $this->initialDBState = $actual;    
-    }
     
-    /**
-     *  Retrieves current data from db
-     */
-    public function getCurrentDBState()
-    {
-        $stmt = $this->db->dbh->prepare("SELECT * FROM $this->table;");
-        $stmt->execute();
-        $current = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $this->currentDBState = $current;        
-    }
-
-    /**
-     *  Resets database to inital state
-     */
-    public function resetDBState(){
-        // delete all rows
-        $sql = "DELETE FROM $this->table WHERE `u_id` > 0;";
-        $stmt = $this->db->dbh->prepare($sql);
-        $stmt->execute();
-
-        $fields = array_keys($this->seed_data);
-        $field_count = count($fields);
-        $field_names = $values = '';
-        for($i = 0; $i < $field_count; $i++){
-            $field_names .= "`" . $fields[$i] . "`";
-            $value = $this->seed_data[$fields[$i]];
-            if(is_string($value)){
-                $values .= "'".$value."'";
-            } else {
-                $values .= $value;
-            }
-            if($i < ($field_count - 1)){
-                $field_names .= ', ';
-                $values .= ', ';
-            }
-        } 
-
-        $sql = "INSERT INTO `$this->table` (" .$field_names. ") VALUES (" .$values. ");";
-        $stmt = $this->db->dbh->prepare($sql);
-        $stmt->execute();
-    }
-    
-    public function testInitialStateOfDatabase()
-    {
-        $this->assertEquals($this->seed_data, $this->initialDBState);
-    }
-
-    public function testCreateUserReturnsFalseWithEmptyParamsArray()
-    {
-        $params = [];
-        $this->assertFalse($this->um->createUser($params));
-    }
-
    /**
      * @param array $params Data used to create new user
      *
@@ -142,11 +58,12 @@ class UserModelTest extends PHPUnit_Framework_TestCase
         $r = $this->um->createUser($params);
         $this->assertFalse($r);        
     }
-
+    
     public function providerTestCreateUserReturnsFalseWithInvalidParamsArray()
     {
         return [
-                [ ['email' => 'a',           // Email too short (6-100 chars)
+                [ [] ],                     // Empty array
+                [ ['email' => 'a',          // Email too short (6-100 chars)
                   'first_name' => 'a',
                   'last_name' => 'a',
                   'password' => 'a' ]
@@ -199,23 +116,36 @@ class UserModelTest extends PHPUnit_Framework_TestCase
             ];
     }
 
+
+   /**
+     *
+     */
+    public function testCreateUserReturnsFalseWhenEmailAlreadyExists()
+    {
+        $params = [ 'email' => 'a@b.io',
+                  'first_name' => 'bob', 
+                  'last_name' => 'jens',   
+                  'password' => 'password1*'
+                ];
+        $r = $this->um->createUser($params);
+        $this->assertFalse($r);
+        $this->dbHelper->resetDBState();
+    }
+
    /**
      *  Should actually create a new user in the `users_test` table
      *  Should also delete the user upon success
      */
     public function testCreateUserReturnsTrueWithValidParamsArray()
     {
-        $params = [ 'email' => 'a@c.io',
+        $params = [ 'email' => 'a@f.io',
                   'first_name' => 'bob', 
                   'last_name' => 'jens',   
                   'password' => 'password1*'
                 ];
         $r = $this->um->createUser($params);
-        if($r){
-            $p = self::getProperty('u_id');
-            $this->um->deleteUser($p->getValue($this->um));
-        }
         $this->assertTrue($r);
+        $this->dbHelper->resetDBState();
     }
 
     public function testValidateParamsWithBadEmailAddress()
@@ -271,8 +201,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase
         $params = ['email' => 'changed@this.app'];
         $id = 1;
         $this->assertTrue($this->um->updateUser($params, $id));
-        //reset
-        $this->resetDBState();
+        $this->dbHelper->resetDBState();
     }
 
     public function testUpdateUserChangesEmailValueInDatabase()
@@ -282,12 +211,11 @@ class UserModelTest extends PHPUnit_Framework_TestCase
         $id = 1;
         $this->um->updateUser($params, $id);
         //  retrieve updated data
-        $stmt = $this->db->dbh->prepare("SELECT `email` FROM `$this->table` WHERE `u_id` = 1;");
-        $stmt->execute();
-        $updated = $stmt->fetch(PDO::FETCH_ASSOC);
+        $sql = "SELECT `email` FROM `$this->table` WHERE `u_id` = 1;";
+        $updated = $this->dbHelper->fetchOne($sql);
         $this->assertEquals($params['email'], $updated['email']);
         //  reset data
-        $this->resetDBState();
+        $this->dbHelper->resetDBState();
     }    
 
     public function testUpdateUserChangesPasswordValueInDatabase()
@@ -297,15 +225,14 @@ class UserModelTest extends PHPUnit_Framework_TestCase
         $id = 1;
         $this->um->updateUser($params, $id);
         //  retrieve updated data
-        $stmt = $this->db->dbh->prepare("SELECT `password` FROM `$this->table` WHERE `u_id` = 1;");
-        $stmt->execute();
-        $updated = $stmt->fetch(PDO::FETCH_ASSOC);
+        $sql = "SELECT `password` FROM `$this->table` WHERE `u_id` = 1;";
+        $updated = $this->dbHelper->fetchOne($sql);
         
         $m = self::getMethod('hashPassword');
         $expected = $m->invokeArgs($this->um, [$params['password']]);
         $this->assertEquals($expected, $updated['password']);
         //  reset data
-        $this->resetDBState();
+        $this->dbHelper->resetDBState();
     }    
 
     public function testDeleteUserReturnsFalseWithInvalidId()
@@ -318,12 +245,12 @@ class UserModelTest extends PHPUnit_Framework_TestCase
     {
         $id = 1;
         $this->assertTrue($this->um->deleteUser($id));    
-        $this->resetDBState();
+        $this->dbHelper->resetDBState();
     }
     
     public function testGetUserIdByEmailReturnsFalseWithInvalidEmailType()
     {
-        $email = 1;
+        $email = 1; 
         $this->assertFalse($this->um->getUserIdByEmail($email));
     }
 
@@ -341,6 +268,6 @@ class UserModelTest extends PHPUnit_Framework_TestCase
     
     public function testGetTableReturnsCorrectValue()
     {
-        $this->assertEquals('users_test', $this->um->getTable());
+        $this->assertEquals($this->table, $this->um->getTable());
     }
 }

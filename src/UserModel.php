@@ -57,9 +57,13 @@ class UserModel
      */
     private $password_key = 'C658CA8776A84';
     /*
-     *  @var string  $response  Random hexadecimal string used in hashPassword()
+     *  @var string  $response  Output passed to view
      */    
     public $response;
+    /*
+     *  @var string  $format  'html' or 'json'
+     */    
+    public $format = 'html';
 
     /*
      *  @param object   $db     PDO connection to database

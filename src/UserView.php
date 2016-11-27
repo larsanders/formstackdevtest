@@ -18,13 +18,13 @@
 class UserView
 {
     /**
-     *  @var object $model  UserModel object
+     *  @var object $m  UserModel object
      */
-    private $model;
+    private $m;
     /**
-     *  @var object $controller  UserController object
+     *  @var object $c  UserController object
      */
-    private $controller;
+    private $c;
     /**
      *  @var string $format  Accepts 'html' or 'json'
      */
@@ -40,13 +40,13 @@ class UserView
 
 
     /**
-     *  @param object $controller  UserController object
-     *  @param object $model  UserModel object
+     *  @param object $c  UserController object
+     *  @param object $m  UserModel object
      */
-    public function __construct($controller, $model) 
+    public function __construct($c, $m) 
     {
-        $this->controller = $controller;
-        $this->model = $model;
+        $this->c = $c;
+        $this->m = $m;
     }
 
     /**
@@ -71,10 +71,19 @@ EOT;
     }
 
     /**
+     *  @param mixed $data  String or array
+     *  @return string      JSON-encoded string
+     */
+    public function renderJSON($data)
+    {
+        return json_encode( ['data' => $data] );
+    }
+    
+    /**
      *  @param array $array     0-indexed array of arrays with key-value pairs
      *  @return string          HTML table
      */
-    protected function renderTable($array)
+    public function renderTable($array)
     {
         $html = '<table>';
         $keys = array_keys($array[0]);
@@ -93,23 +102,55 @@ EOT;
         $html .= '</table>';
         return $html;
     }
-    
+
     /**
-     *  @param object $controller  UserController object
-     *  @param object $model  UserModel object
+     *  @param string $format  'html' or 'json'
      *  @return string
      */
-    public function render($format = 'html')
+    public function renderIndex($format)
     {
-        switch(strtolower($format)){
-            case 'html':
-                return $this->renderHTML( $this->model->response );
-            case 'table':
-                $table = $this->renderTable( $this->model->response );
-                return $this->renderHTML( $table );
+        $str = 'Welcome to the User Management App. Available actions = | ';
+        foreach($this->c->actions as $a){
+            $str .= $a.' | ';
+        }
+        switch($format){
             case 'json':
-                return json_encode( ['resp' => $this->model->response] );
-            default: break;
+                return $this->renderJSON($str);
+                break;
+            case 'html':
+                return $this->renderHTML($str);
+                break;
+            default:
+                return $this->renderHTML($str);
+                break;
+        }
+    }
+    
+    /**
+     *  @param object $c  UserController object
+     *  @param object $m  UserModel object
+     *  @return string
+     */
+    public function render()
+    {
+        $format = strtolower($this->m->format);
+        //  if there is no response from the model, display the index
+        if($this->m->response == null){
+            return $this->renderIndex($format);
+        }
+        //  special case for displaying HTML table of users
+        if($this->c->action == 'showall' && $format == 'html'){
+            $table = $this->renderTable( $this->m->response );
+            return $this->renderHTML( $table ); 
+        }
+        //  default cases
+        switch($format){
+            case 'html':
+                return $this->renderHTML( $this->m->response );
+            case 'json':
+                return $this->renderJSON( $this->m->response );
+            default: 
+                break;
         }
     }
 }

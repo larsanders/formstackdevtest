@@ -67,15 +67,15 @@ class dbTestHelper
         $fields = array_keys($this->seed_data);
         $field_count = count($fields);
         $field_names = $values = '';
-        for($i = 0; $i < $field_count; $i++){
+        for ($i = 0; $i < $field_count; $i++) {
             $field_names .= "`" . $fields[$i] . "`";
             $value = $this->seed_data[$fields[$i]];
-            if(is_string($value)){
+            if (is_string($value)) {
                 $values .= "'".$value."'";
             } else {
                 $values .= $value;
             }
-            if($i < ($field_count - 1)){
+            if ($i < ($field_count - 1)) {
                 $field_names .= ', ';
                 $values .= ', ';
             }
@@ -91,7 +91,7 @@ class dbTestHelper
      */
     public function testInitialDBState()
     {
-        if($this->seed_data === $this->initial_db_state){
+        if ($this->seed_data === $this->initial_db_state) {
             $this->db_ready = true;
         } else {
             $this->resetDBState();
@@ -101,11 +101,15 @@ class dbTestHelper
     
     /**
      *  Returns a single record
+     *  
+     *  @param string $query    A valid MySQL query
      */
     public function fetchOne($query)
     {
         $stmt = $this->db->dbh->prepare($query);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($stmt->execute()){
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+        return false;
     }
 }

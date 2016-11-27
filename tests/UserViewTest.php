@@ -96,21 +96,21 @@ class UserViewTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testRenderIndexReturnsValidHtml()
+    public function testRenderWelcomeReturnsValidHtml()
     {
-        $result = $this->uv->renderIndex('html');
+        $result = $this->uv->renderWelcome('html');
         $this->assertEquals($this->default_index, $result);
     }
     
-    public function testRenderIndexReturnsValidHtmlWithFormatParameterMissing()
+    public function testRenderWelcomeReturnsValidHtmlWithFormatParameterMissing()
     {
-        $result = $this->uv->renderIndex('');
+        $result = $this->uv->renderWelcome('');
         $this->assertEquals($this->default_index, $result);
     }
     
-    public function testRenderIndexReturnsValidJson()
+    public function testRenderWelcomeReturnsValidJson()
     {
-        $result = $this->uv->renderIndex('json');
+        $result = $this->uv->renderWelcome('json');
         $expected = '{"data":"Welcome to the User Management App. Available actions = | create | update | delete | showall | "}';
         $this->assertEquals($expected, $result);    
     }
@@ -130,6 +130,10 @@ class UserViewTest extends PHPUnit_Framework_TestCase
         $result = $this->uv->render();
         $this->assertEquals($this->default_table, $result);    
     }
+    
+    /*
+     *  @todo find a better way to test this
+     */
 
     public function testRenderReturnsHtmlDeletedMessageAfterUserDelete()
     {

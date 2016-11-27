@@ -5,6 +5,9 @@
  */
 
 class DB {
+    public $error;
+    public $dbh;
+    public $fetch_mode = PDO::FETCH_ASSOC;
     private $db_server;
     private $db_name;
     private $db_user;
@@ -12,10 +15,6 @@ class DB {
     private $db_port;
     private $db_charset;
     private $db_dsn;
-    public $db_table = '';
-    public $error;
-    public $dbh;
-    public $fetch_mode = PDO::FETCH_ASSOC;
     
     /**
      *  @param array $config    Array of database connection parameters
@@ -26,7 +25,7 @@ class DB {
         $this->db_user = isset($config['db_user']) ? $config['db_user'] : '';
         $this->db_pass = isset($config['db_pass']) ? $config['db_pass'] : '';
         $this->db_port = isset($config['db_port']) ? $config['db_port'] : 3306;
-        $this->db_charset = isset($config['db_charset']) ? $config['db_charset'] : 'UTF8';     
+        $this->db_charset = isset($config['db_charset']) ? $config['db_charset'] : 'UTF8';
         $this->setDSN();
         $this->connectDBH();
     }
@@ -49,15 +48,15 @@ class DB {
             $dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $this->dbh = $dbh;
         } catch(PDOException $e) {
-            $this->error = $this->printError($e);
+            $this->error = $this->printPDOException($e);
         }    
     }
     
     /*
-     *  @param PDO Exception $e 
+     *  @param PDO Exception $e     Exception object
      *  @return string
      */
-    private function printError($e){
-        return 'PDO EXCEPTION: ' . $e->getMessage() . ' in file ' .  $e->getFile() . ':' . $e->getLine() .'<br>';
+    private function printPDOException($e){
+        return "PDO EXCEPTION: " . $e->getMessage() . " in file " . $e->getFile().":".$e->getLine()." \n";
     }
 }

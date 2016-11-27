@@ -16,7 +16,6 @@ class UserControllerTest extends PHPUnit_Framework_TestCase
     private $uc;
     private $table = 'users_test';
 
-    /** Setup before each test */        
     public function setUp()
     {
         $this->dbHelper = new dbTestHelper();        
@@ -79,7 +78,6 @@ class UserControllerTest extends PHPUnit_Framework_TestCase
     public function testExecuteActionReturnsIntWithCreateUserAction()
     {
         $this->uc->action = 'create';
-        //  valid seed data for new user
         $params = [ 'email' => 'new@user.io',
                   'first_name' => 'newTest', 
                   'last_name' => 'user',   

@@ -1,40 +1,32 @@
 <?php
 /**
- * UserView render output in HTML or JSON.
+ * Class UserView renders HTML or JSON strings
  *              
- * @file      UserView.php
- * @namespace app\views
- * @author    Lars A. Rehnberg
- * @version   0.0.1
+ * @class       UserView
+ * @file        UserView.php
+ * @namespace   app\views
+ * @author      Lars A. Rehnberg
+ * @version     0.0.1
  */
-//namespace app\models;
-
-/**
- * Class UserView returns HTML or JSON
- * @class   UserView
- * @package app\models
- */
+ 
+//namespace app\views;
 
 class UserView
 {
     /**
-     *  @var object $m  UserModel object
+     *  @var object $m      UserModel object
      */
     private $m;
     /**
-     *  @var object $c  UserController object
+     *  @var object $c      UserController object
      */
     private $c;
     /**
-     *  @var string $format  Accepts 'html' or 'json'
-     */
-    public $format;
-    /**
-     *  @var string $title  Becomes the title of the html page
+     *  @var string $title      Title element of the html page
      */
     public $title = 'Users';
     /**
-     *  @var string $description  Becomes the description of the html page
+     *  @var string $description    Description of the html page
      */
     public $description = 'Page for creating, updating, deleting, and viewing users.';
 
@@ -50,6 +42,8 @@ class UserView
     }
 
     /**
+     *  Outputs simmple HTML 5 index  
+     *
      *  @param string $body     UserController object
      *  @return string          HTML page
      */
@@ -71,6 +65,8 @@ EOT;
     }
 
     /**
+     *  Converts strings or array to JSON
+     *
      *  @param mixed $data  String or array
      *  @return string      JSON-encoded string
      */
@@ -80,21 +76,25 @@ EOT;
     }
     
     /**
+     *  Converts multidimensional array into HTML an table
+     *  Each sub-array must identical associative keys
+     *
      *  @param array $array     0-indexed array of arrays with key-value pairs
      *  @return string          HTML table
      */
     public function renderTable($array)
     {
-        $html = '<table>';
         $keys = array_keys($array[0]);
+
+        $html = '<table>';
         $html .= '<tr>';
-        foreach($keys as $k){
+        foreach ($keys as $k) {
             $html .= '<th>'.$k.'</th>';
         }
         $html .= '</tr>';
-        foreach($array as $k => $a){
+        foreach ($array as $k => $a) {
             $html .= '<tr>';
-            foreach($a as $key => $v){
+            foreach ($a as $key => $v) {
                 $html .= '<td>'.$v.'</td>';
             }
             $html .= '</tr>';
@@ -104,16 +104,18 @@ EOT;
     }
 
     /**
+     *  Renders a welcome page
+     *
      *  @param string $format  'html' or 'json'
      *  @return string
      */
-    public function renderIndex($format)
+    public function renderWelcome()
     {
         $str = 'Welcome to the User Management App. Available actions = | ';
-        foreach($this->c->actions as $a){
+        foreach ($this->c->actions as $a) {
             $str .= $a.' | ';
         }
-        switch($format){
+        switch ($this->m->format) {
             case 'json':
                 return $this->renderJSON($str);
             case 'html':
@@ -124,26 +126,31 @@ EOT;
     }
     
     /**
+     *  Main function call to output the View 
+     *
      *  @return string
+     *  @todo refactor to avoid special case
      */
     public function render()
     {
-        $format = strtolower($this->m->format);
+        
         //  if there is no response from the model, display the index
-        if($this->m->response == null){
-            return $this->renderIndex($format);
+        if ($this->m->response == null) {
+            return $this->renderWelcome();
         }
+        
         //  special case for displaying HTML table of users
-        if($this->c->action == 'showall' && $format == 'html'){
-            $table = $this->renderTable( $this->m->response );
-            return $this->renderHTML( $table ); 
+        if ($this->c->action == 'showall' && $this->m->format == 'html') {
+            $table = $this->renderTable($this->m->response);
+            return $this->renderHTML($table); 
         }
-        //  standard cases
-        switch($format){
+        
+        //  standard cases for non-null responses
+        switch ($this->m->format) {
             case 'html':
-                return $this->renderHTML( $this->m->response );
+                return $this->renderHTML($this->m->response);
             case 'json':
-                return $this->renderJSON( $this->m->response );
+                return $this->renderJSON($this->m->response);
         }
     }
 }

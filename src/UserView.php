@@ -116,19 +116,14 @@ EOT;
         switch($format){
             case 'json':
                 return $this->renderJSON($str);
-                break;
             case 'html':
                 return $this->renderHTML($str);
-                break;
             default:
                 return $this->renderHTML($str);
-                break;
         }
     }
     
     /**
-     *  @param object $c  UserController object
-     *  @param object $m  UserModel object
      *  @return string
      */
     public function render()
@@ -143,14 +138,12 @@ EOT;
             $table = $this->renderTable( $this->m->response );
             return $this->renderHTML( $table ); 
         }
-        //  default cases
+        //  standard cases
         switch($format){
             case 'html':
                 return $this->renderHTML( $this->m->response );
             case 'json':
                 return $this->renderJSON( $this->m->response );
-            default: 
-                break;
         }
     }
 }

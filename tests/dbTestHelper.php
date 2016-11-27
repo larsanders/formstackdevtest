@@ -24,9 +24,10 @@ class dbTestHelper
     /**
      *  Generates a database connection
      */        
-    public function __construct()
+    public function __construct($other_config = [])
     {
         include '/vagrant/config/settings.php';
+        $settings = !empty($other_config) ? $other_config : $settings;
         $this->db = new DB($settings);
         $this->getInitialDBState();
         $this->testInitialDBState();
@@ -97,8 +98,9 @@ class dbTestHelper
             $this->db_ready = true;
         }
     }
+    
     /**
-     *
+     *  Returns a single record
      */
     public function fetchOne($query)
     {

@@ -114,4 +114,9 @@ class UserControllerTest extends PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $this->uc->executeAction());
     }
 
+    public function testExecuteActionReturnsFalseWithNoAction()
+    {
+        $this->uc->action = null;
+        $this->assertFalse($this->uc->executeAction());
+    }
 }

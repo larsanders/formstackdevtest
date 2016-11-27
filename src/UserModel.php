@@ -143,7 +143,7 @@ class UserModel
             $values = '';
             for($i = 0; $i < $param_count; $i++){
                 $values .= "`$fields[$i]` = ?";
-                if($i > 0 && $i < ($param_count - 1)){
+                if($i < ($param_count - 1)){
                     $values .= ', ';
                 }
             }
@@ -322,18 +322,12 @@ class UserModel
                 $fields .= ', ';
             }
         }
+        
         $sql = "SELECT $fields FROM `$this->table`;";
         $stmt = $this->db->dbh->prepare($sql);
-
-        try {
-            $allUsers = $stmt->execute();
-            if($allUsers){
-                return $stmt->fetchAll($this->db->fetch_mode);
-            }
-            return false;
-        } catch( PDOException $e ) {
-            $this->response = $this->printPDOException($e);
-            return false;
+        $result = $stmt->execute();
+        if($result){
+            return $stmt->fetchAll($this->db->fetch_mode);
         }
     }
     

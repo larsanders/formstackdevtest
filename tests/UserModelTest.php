@@ -204,6 +204,15 @@ class UserModelTest extends PHPUnit_Framework_TestCase
         $this->dbHelper->resetDBState();
     }
 
+    public function testUpdateUserReturnsTrueWithMultipleValidParamsAndId()
+    {
+        $params = ['email' => 'changed@this.app',
+                   'first_name' => 'newname' ];
+        $id = 1;
+        $this->assertTrue($this->um->updateUser($params, $id));
+        $this->dbHelper->resetDBState();
+    }
+
     public function testUpdateUserChangesEmailValueInDatabase()
     {
         //  update data
@@ -269,5 +278,11 @@ class UserModelTest extends PHPUnit_Framework_TestCase
     public function testGetTableReturnsCorrectValue()
     {
         $this->assertEquals($this->table, $this->um->getTable());
+    }
+
+    public function showAllUsersThrowsExceptionWhenPublicFieldsCorrupted()
+    {
+        $this->um->public_fields = [];
+        $this->assertFalse($this->um->showAllUsers());
     }
 }

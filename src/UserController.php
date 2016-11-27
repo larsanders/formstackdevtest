@@ -121,13 +121,13 @@ class UserController
                 case 'update':
                     if($param_count < 1 || $param_count > 4 || $id == 0){
                         $this->m->response = 'Missing parameters for this action.';
-                        return false;                        
+                        return false;
                     }
                     break;
                 case 'delete':
                     if($id == 0){
                         $this->m->response = 'Missing id for this action.';
-                        return false;                        
+                        return false;
                     }
                     break;
                 default:
@@ -137,7 +137,7 @@ class UserController
             //  no action set
             $this->m->response = null;
             return false;
-         }
+        }
         $this->action = isset($action) ? $action : null;
         $this->params = !empty($params) ? $params : null;
         $this->id = isset($id) && $id > 0 ? $id : null;
@@ -146,20 +146,19 @@ class UserController
     }
     
     public function executeAction(){
-        switch($this->action){
-            case 'create':
-                return $this->m->createUser($this->params);
-            break;
-            case 'update':
-                return $this->m->updateUser($this->params, $this->id);
-            break;
-            case 'delete':
-                return $this->m->deleteUser($this->id);
-            break;
-            case 'showall':
-                return $this->m->showAllUsers();
-            break;
-        }    
+        if(isset($this->action) && !empty($this->action)){
+            switch($this->action){
+                case 'create':
+                    return $this->m->createUser($this->params);
+                case 'update':
+                    return $this->m->updateUser($this->params, $this->id);
+                case 'delete':
+                    return $this->m->deleteUser($this->id);
+                case 'showall':
+                    return $this->m->showAllUsers();
+            }
+        }
+        return false;
     }
 
 }

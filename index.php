@@ -13,12 +13,7 @@ $uri = $_SERVER["REQUEST_URI"];
 $c->parseRoute($uri);
 
 //  execute
-if(isset($c->action) && !empty($c->action)){
-    $c->executeAction();
-    $output = $v->render();
-} else {
-    $output = $v->renderIndex($m->format);
-}
+$c->executeAction();
 
 //  output
-echo $output;
+echo $v->render();

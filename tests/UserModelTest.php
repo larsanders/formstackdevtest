@@ -3,8 +3,11 @@
  *  @todo setup autoloading
  *  @todo add namespace
  */
+
 include_once '/vagrant/tests/dbTestHelper.php';
 include_once '/vagrant/src/UserModel.php';
+
+// use models\UserModel;
 
 class UserModelTest extends PHPUnit_Framework_TestCase
 {
@@ -117,9 +120,6 @@ class UserModelTest extends PHPUnit_Framework_TestCase
     }
 
 
-   /**
-     *
-     */
     public function testCreateUserReturnsFalseWhenEmailAlreadyExists()
     {
         $params = [ 'email' => 'a@b.io',
@@ -132,10 +132,6 @@ class UserModelTest extends PHPUnit_Framework_TestCase
         $this->dbHelper->resetDBState();
     }
 
-   /**
-     *  Should actually create a new user in the `users_test` table
-     *  Should also delete the user upon success
-     */
     public function testCreateUserReturnsTrueWithValidParamsArray()
     {
         $params = [ 'email' => 'a@f.io',

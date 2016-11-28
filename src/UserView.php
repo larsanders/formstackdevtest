@@ -9,7 +9,7 @@
  * @version     0.0.1
  */
  
-//namespace app\views;
+// namespace views;
 
 class UserView
 {
@@ -106,11 +106,14 @@ EOT;
     /**
      *  Renders a welcome page
      *
-     *  @param string $format  'html' or 'json'
+     *  @param string $format  Allows override of model's default format
      *  @return string
      */
-    public function renderWelcome()
+    public function renderWelcome($format = '')
     {
+        if ($format != '' && is_string($format)) {
+            $this->m->format = $format;
+        }
         $str = 'Welcome to the User Management App. Available actions = | ';
         foreach ($this->c->actions as $a) {
             $str .= $a.' | ';
@@ -119,8 +122,6 @@ EOT;
             case 'json':
                 return $this->renderJSON($str);
             case 'html':
-                return $this->renderHTML($str);
-            default:
                 return $this->renderHTML($str);
         }
     }

@@ -3,8 +3,12 @@
  *  I did not find the DBUnit extension in the vagrant install, 
  *  so I rolled my own helper class.
  */
+ 
+// namespace tests;
 
-include '/vagrant/src/db.php';
+require_once '/vagrant/src/DB.php';
+
+// use database\DB;
 
 class dbTestHelper
 {

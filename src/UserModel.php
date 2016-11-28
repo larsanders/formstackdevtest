@@ -1,21 +1,17 @@
 <?php
 /**
- * UserModel contains the business logic for user-related CRUD tasks in the app.
+ * Class UserModel contains the business logic for user-related CRUD tasks in the app.
  * 
  * Simple, four-field user model, using a PDO database connection and MySQL syntax.           
  *              
+ * @class     UserModel
  * @file      UserModel.php
- * @namespace app\models
+ * @namespace models
  * @author    Lars A. Rehnberg
- * @version   0.0.0
+ * @version   0.0.1
  */
-//namespace app\models;
 
-/**
- * Class UserModel represents app users
- * @class   UserModel
- * @package app\models
- */
+// namespace models;
 
 class UserModel
 {
@@ -23,62 +19,72 @@ class UserModel
      *  @var string $table      Default database table name.
      */
     public $table = 'users';
-    /*
+    
+    /**
      *  @var int    $u_id       User id number, generated upon insertion in db.
      */
     protected $u_id;
-    /*
+    
+    /**
      *  @var array  $fields     
      *  
      *  List of fields required to create a new user in the db.  
      *  New fields must be added here and in the case statmeent of validateParams()
      */
     public $fields = [ 'email', 'first_name', 'last_name', 'password' ];
-    /*
+    
+    /**
      *  @var array  $public_fields  List of fields the app is allowed to display.
      */
     protected $public_fields = [ 'u_id', 'email', 'first_name', 'last_name' ];
-    /*
+    
+    /**
      *  @var array  $field_count    Number of fields required to create a new user.
      */
     protected $field_count = 0;
-    /*
+    
+    /**
      *  @var object  $db        PDO object connected to database.
      */
     protected $db;
-    /*
+    
+    /**
      *  @var array  $errors     Array of errors generated during execution.
      */
     public $errors = [];
-    /*
+    
+    /**
      *  @var string  $password_regex    
      *  
      *  PCRE Regex pattern requiring 1 letter, 1 number, and 1 special character
      */
     private $password_regex = "~^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$~";
-    /*
+    
+    /**
      *  @var string  $password_key  Random hexadecimal string used in hashPassword()
      */
     private $password_key = 'C658CA8776A84';
-    /*
+    
+    /**
      *  @var string  $response  Output passed to view
      */    
     public $response;
-    /*
+    
+    /**
      *  @var string  $format  'html' or 'json', defaults to html
-     */    
+     */
     public $format = 'html';
 
-    /*
+    /**
      *  @param object   $db     PDO connection to database
-     */        
+     */
     public function __construct($db)
     {
         $this->db = $db;
         $this->field_count = count($this->fields);
     }
 
-    /*
+    /**
      *  Sets the database table for all UserModel actions
      *
      *  @param string   $table
@@ -89,15 +95,15 @@ class UserModel
         }
     }
     
-     /*
+    /**
      *  Gets the database table
      */
     public function getTable(){
         return $this->table;
     }
 
-    /*
-     *  Create a new user record
+    /**
+     *  Creates a new user record
      *
      *  @param array  $params           Array structure below
      *  array['params']         array
@@ -149,8 +155,8 @@ class UserModel
         }
     }
     
-    /*
-     *  Updates user records
+    /**
+     *  Updates existing user records
      *
      *  @param array    $params     Array containing one or more of the params from the fields array
      *  @param int      $id         Database id of user to update
@@ -183,7 +189,7 @@ class UserModel
             }
             $stmt->bindValue($param_count+1, $id);
             $update_result = $stmt->execute();
-            $this->response = $update_result ? 'user updated' : 'user update failed';
+            $this->response = $update_result ? 'User updated' : 'User update failed';
             return $update_result;
         } else {
             $this->response = $this->printErrors();
@@ -191,7 +197,7 @@ class UserModel
         }
     }
 
-    /*
+    /**
      *  Deletes user record permanently
      *
      *  @param int      $id         Database id of user to delete
@@ -210,7 +216,7 @@ class UserModel
         return false;
     }
 
-    /*
+    /**
      *  Finds the user id for a given email address  
      *
      *  @param string   $email      Email address of user
@@ -238,7 +244,7 @@ class UserModel
         }
     }
 
-    /*
+    /**
      *  Good old-fashioned server-side validation  
      *
      *  @param array    $params     Array containing one or more of the params from the fields array
@@ -297,7 +303,7 @@ class UserModel
         return true;        
     }
 
-    /*
+    /**
      *  Validates a user id number presented in a route  
      *
      *  @param int $id      Database id of user to update
@@ -314,7 +320,7 @@ class UserModel
         return true;
     }
     
-    /*
+    /**
      *  Hashes passwords  
      *
      *  @param string   $str    Plaintext password
@@ -325,7 +331,7 @@ class UserModel
         return hash_hmac('sha256', $str, $this->password_key);
     }
 
-    /*
+    /**
      *  Concatenates all existing errors
      *
      *  @return string          All errors
@@ -339,7 +345,7 @@ class UserModel
         return $error_resp;
     }
 
-    /*
+    /**
      *  @param  PDO Exception   PDO Exception object from try-catch blocks
      *  @return string          Human-readable error string
      */    
@@ -348,7 +354,7 @@ class UserModel
         return 'PDO EXCEPTION: ' . $e->getMessage() . ' in file ' .  $e->getFile() . ':' . $e->getLine() .'';
     }
 
-    /*
+    /**
      *  Returns multi-dimensional array of users based on $this->public_fields
      *
      *  @return array|boolean   Array of users, or false on failure
@@ -372,7 +378,7 @@ class UserModel
         }
     }
     
-    /*
+    /**
      *  Public interface for getAllUsers  
      *
      *  @return array|string   Array with all public fields for all existing users, or error message on failure

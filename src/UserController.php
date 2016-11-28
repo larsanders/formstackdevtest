@@ -1,11 +1,17 @@
 <?php
 
 /**
- * Show a list of all of the application's users.
- *
- * @return Response
- *
+ * Class UserController resolves incoming routes and executes the related action
+ *              
+ * @class     UserController
+ * @file      UserController.php
+ * @namespace src\controllers
+ * @author    Lars A. Rehnberg
+ * @version   0.0.1
  */
+
+// namespace controllers;
+ 
 class UserController
 {
     private $m;
@@ -30,8 +36,9 @@ class UserController
      *  
      *  General forms
      *      index.php/action/key/value/key/value
-     *      index.php/action/id/int
+     *      index.php?action=action&key=value
      *
+     *  Examples
      *      index.php/create/email/a@b.io/first_name/foo/last_name/bar/password/8c88*SW1
      *      index.php?action=create&email=a@b.io&first_name=foo&last_name=bar&password=8c88*SW1
      *
@@ -143,11 +150,11 @@ class UserController
             return false;
         }
         
-        // Finally, set the values
+        //  Finally, set the values
         $this->action = isset($action) ? $action : null;
         $this->params = !empty($params) ? $params : null;
         $this->id = isset($id) && $id > 0 ? $id : null;
-        $this->m->format = isset($format) ? $format : 'html';
+        $this->m->format = isset($format) ? $format : $this->m->format;
         return true;
     }
     
@@ -171,5 +178,4 @@ class UserController
         }
         return false;
     }
-
 }

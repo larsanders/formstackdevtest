@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="true">
     <testsuites>
-        <testsuite name="my_app Tests" bootstrap="tests/autoloadTest.php">
-            <directory>./tests/</directory>
+        <testsuite name="my_app Tests" bootstrap="">
+            <directory>./</directory>
         </testsuite>
     </testsuites>
     <filter>
       <whitelist processUncoveredFilesFromWhitelist="true">
-        <directory suffix=".php">src/</directory>
+        <directory suffix=".php">../src/</directory>
         <exclude>
-            <file>src/autoload.php</file>
+            <file>autoload.php</file>
         </exclude>
       </whitelist>
     </filter>    

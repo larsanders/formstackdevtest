@@ -3,10 +3,13 @@
  *  @todo setup autoloading
  *  @todo add namespace
  */
+
 include_once '/vagrant/tests/dbTestHelper.php';
 include_once '/vagrant/src/UserModel.php';
 include_once '/vagrant/src/UserController.php';
 
+// use models\UserModel;
+// use controllers\UserController;
 
 class UserControllerTest extends PHPUnit_Framework_TestCase
 {

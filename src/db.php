@@ -1,8 +1,18 @@
 <?php
+
 /**
- *  Basic PDO/MySQL database object
- *  @todo Add docblocks
+ * Basic PDO/MySQL database object
+ * 
+ * @class     DB
+ * @file      DB.php
+ * @namespace src\db
+ * @author    Lars A. Rehnberg
+ * @version   0.0.1
  */
+
+// namespace database;
+
+// use \PDO;
 
 class DB {
     public $error;
@@ -43,16 +53,16 @@ class DB {
      */
     private function connectDBH(){
         try {
-            $dbh = new PDO($this->db_dsn, $this->db_user, $this->db_pass);
+            $dbh = new \PDO($this->db_dsn, $this->db_user, $this->db_pass);
             $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $this->dbh = $dbh;
-        } catch(PDOException $e) {
+        } catch (PDOException $e) {
             $this->error = $this->printPDOException($e);
         }    
     }
     
-    /*
+    /**
      *  @param PDO Exception $e     Exception object
      *  @return string
      */
